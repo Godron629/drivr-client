@@ -15,7 +15,6 @@ A web-based dashboard for controlling multiple Assetto Corsa client setups remot
 
 1. Install dependencies:
 ```bash
-cd dashboard
 pip install -r requirements.txt
 ```
 

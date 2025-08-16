@@ -7,4 +7,4 @@ if "AHK_EXE" not in os.environ:
 # Assign to globals
 AHK_EXE = os.environ["AHK_EXE"]
 
-SCRIPTS_DIR = "../../ahk/"
+SCRIPTS_DIR = "ahk/"
