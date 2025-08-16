@@ -159,7 +159,8 @@ async function sendCommand(clientId, command) {
         }
     } catch (error) {
         statusDiv.className = 'status-message status-error';
-        statusDiv.textContent = 'Failed to connect to client';
+        statusDiv.textContent = `Failed to connect to client: ${error.message}`;
+        console.error('Connection error:', error);
     }
     
     // Remove loading state
