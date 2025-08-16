@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assetto Corsa Client Control Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Assetto Corsa Control Dashboard</h1>
+    </div>
+    
+    <div class="dashboard">
+        <div id="clients-container">
+            <!-- Client boxes will be dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="add-client">
+        <h3>Add New Client</h3>
+        <input type="text" id="client-name" placeholder="Client Name">
+        <input type="text" id="client-ip" placeholder="IP Address (e.g., 192.168.1.100)">
+        <button onclick="addClient()">Add Client</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

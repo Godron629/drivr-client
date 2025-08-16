@@ -1,31 +1,45 @@
-# DriVR Client
+# DriVR - Assetto Corsa Control System
 
-This is a Flask web server that executes AutoHotKey scripts. 
+A system for remotely controlling multiple Assetto Corsa client setups through a web dashboard.
 
-It can: 
-* Start processes
-* Send keystrokes 
-* Stop processes
+## Components
 
-# Pre-requisites
-* Install [AutoHotkey (AHK)](https://www.autohotkey.com/)
+- **Client** (`client/`): Flask server that runs on each sim setup, executes AutoHotkey scripts
+- **Dashboard** (`dashboard/`): Web-based control interface for managing multiple clients
+- **AHK Scripts** (`ahk/`): AutoHotkey scripts for game interaction
 
-# Getting Started
+## Quick Start
+
+### 1. Setup Client (on each sim setup)
 
 ```sh
-// Create virtual environment
+cd client
 python -m venv venv
 .\venv\Scripts\activate
-
-// Install Dependencies
 pip install -r requirements.txt
 
 // Set environment variables (PowerShell)
 $env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
 
-// Run server 
-python .\run.py
+// Run client server (port 5000)
+python run.py
 ```
+
+### 2. Setup Dashboard (central control)
+
+```sh
+cd dashboard
+pip install -r requirements.txt
+
+// Run dashboard (port 8080)
+python run.py
+```
+
+### 3. Access Dashboard
+Open browser to `http://localhost:8080` and add your client IPs to start controlling them.
+
+## Pre-requisites
+* Install [AutoHotkey (AHK)](https://www.autohotkey.com/) on each client machine
 
 # Example Requests
 
