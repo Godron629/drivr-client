@@ -1,12 +1,13 @@
 // Store client configurations
 let clients = [];
+let raceServers = [];
 
 // Load clients from localStorage on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadClients();
+    loadRaceServers();
     renderClients();
-    // Check client status every 30 seconds
-    setInterval(checkAllClientsStatus, 30000);
+    renderRaceServers();
 });
 
 function loadClients() {
@@ -18,6 +19,17 @@ function loadClients() {
 
 function saveClients() {
     localStorage.setItem('assettoClients', JSON.stringify(clients));
+}
+
+function loadRaceServers() {
+    const savedServers = localStorage.getItem('assettoRaceServers');
+    if (savedServers) {
+        raceServers = JSON.parse(savedServers);
+    }
+}
+
+function saveRaceServers() {
+    localStorage.setItem('assettoRaceServers', JSON.stringify(raceServers));
 }
 
 function addClient() {
@@ -38,8 +50,7 @@ function addClient() {
     const client = {
         id: Date.now(),
         name: name,
-        ip: ip,
-        status: 'unknown'
+        ip: ip
     };
     
     clients.push(client);
@@ -49,9 +60,6 @@ function addClient() {
     // Clear input fields
     document.getElementById('client-name').value = '';
     document.getElementById('client-ip').value = '';
-    
-    // Check status of new client
-    checkClientStatus(client.id);
 }
 
 function removeClient(clientId) {
@@ -69,12 +77,18 @@ function renderClients() {
     clients.forEach(client => {
         const clientBox = createClientBox(client);
         container.appendChild(clientBox);
+        
+        // Populate the server dropdown for this client
+        const select = document.getElementById(`server-select-${client.id}`);
+        if (select) {
+            updateServerSelect(select);
+        }
     });
 }
 
 function createClientBox(client) {
     const box = document.createElement('div');
-    box.className = `client-box ${client.status}`;
+    box.className = 'client-box';
     box.id = `client-${client.id}`;
     
     box.innerHTML = `
@@ -83,10 +97,12 @@ function createClientBox(client) {
                 <div class="client-name">${client.name}</div>
                 <div class="client-ip">${client.ip}:5000</div>
             </div>
-            <div class="status-indicator ${client.status}" title="Status: ${client.status}"></div>
         </div>
         
         <div class="controls">
+            <select id="server-select-${client.id}" class="server-select">
+                <option value="">Select Race Server</option>
+            </select>
             <button class="btn btn-primary" onclick="sendRaceInvite('${client.id}')">
                 Race Invite
             </button>
@@ -137,22 +153,17 @@ async function sendCommand(clientId, command) {
         if (response.ok && result.status === 'success') {
             statusDiv.className = 'status-message status-success';
             statusDiv.textContent = 'Command sent successfully';
-            client.status = 'online';
         } else {
             statusDiv.className = 'status-message status-error';
             statusDiv.textContent = result.stderr || result.error || 'Command failed';
-            client.status = 'online'; // Still online, just command failed
         }
     } catch (error) {
         statusDiv.className = 'status-message status-error';
         statusDiv.textContent = 'Failed to connect to client';
-        client.status = 'offline';
     }
     
-    // Remove loading state and update UI
+    // Remove loading state
     clientBox.classList.remove('loading');
-    clientBox.className = `client-box ${client.status}`;
-    document.querySelector(`#client-${clientId} .status-indicator`).className = `status-indicator ${client.status}`;
     
     // Hide status message after 3 seconds
     setTimeout(() => {
@@ -162,50 +173,108 @@ async function sendCommand(clientId, command) {
     saveClients();
 }
 
-async function checkClientStatus(clientId) {
-    const client = clients.find(c => c.id == clientId);
-    if (!client) return;
+function addRaceServer() {
+    const name = document.getElementById('server-name').value.trim();
+    const ip = document.getElementById('server-ip').value.trim();
     
-    try {
-        const response = await fetch(`http://${client.ip}:5000/run`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                script_name: "send-keystroke.ahk",
-                args: ["notepad.exe", ""] // Simple test command
-            })
-        });
-        
-        client.status = response.ok ? 'online' : 'offline';
-    } catch (error) {
-        client.status = 'offline';
+    if (!name || !ip) {
+        alert('Please enter both server name and IP address');
+        return;
     }
     
-    // Update UI
-    const clientBox = document.getElementById(`client-${clientId}`);
-    if (clientBox) {
-        clientBox.className = `client-box ${client.status}`;
-        document.querySelector(`#client-${clientId} .status-indicator`).className = `status-indicator ${client.status}`;
+    // Check if server already exists
+    if (raceServers.find(s => s.ip === ip)) {
+        alert('Server with this IP already exists');
+        return;
     }
     
-    saveClients();
+    const server = {
+        id: Date.now(),
+        name: name,
+        ip: ip
+    };
+    
+    raceServers.push(server);
+    saveRaceServers();
+    renderRaceServers();
+    
+    // Clear input fields
+    document.getElementById('server-name').value = '';
+    document.getElementById('server-ip').value = '';
+    
+    // Update all client dropdowns
+    updateAllServerSelects();
 }
 
-function checkAllClientsStatus() {
-    clients.forEach(client => {
-        checkClientStatus(client.id);
+function removeRaceServer(serverId) {
+    if (confirm('Are you sure you want to remove this race server?')) {
+        raceServers = raceServers.filter(s => s.id !== serverId);
+        saveRaceServers();
+        renderRaceServers();
+        updateAllServerSelects();
+    }
+}
+
+function renderRaceServers() {
+    const container = document.getElementById('servers-container');
+    container.innerHTML = '';
+    
+    raceServers.forEach(server => {
+        const serverItem = document.createElement('div');
+        serverItem.className = 'server-item';
+        serverItem.innerHTML = `
+            <span>${server.name} (${server.ip})</span>
+            <button class="btn btn-danger btn-small" onclick="removeRaceServer('${server.id}')">Remove</button>
+        `;
+        container.appendChild(serverItem);
     });
 }
 
+function updateAllServerSelects() {
+    clients.forEach(client => {
+        const select = document.getElementById(`server-select-${client.id}`);
+        if (select) {
+            updateServerSelect(select);
+        }
+    });
+}
+
+function updateServerSelect(selectElement) {
+    // Keep the current selection if it exists
+    const currentValue = selectElement.value;
+    
+    // Clear existing options except the first one
+    selectElement.innerHTML = '<option value="">Select Race Server</option>';
+    
+    // Add all race servers
+    raceServers.forEach(server => {
+        const option = document.createElement('option');
+        option.value = server.ip;
+        option.textContent = `${server.name} (${server.ip})`;
+        selectElement.appendChild(option);
+    });
+    
+    // Restore selection if it still exists
+    if (currentValue && raceServers.find(s => s.ip === currentValue)) {
+        selectElement.value = currentValue;
+    }
+}
+
+
 // Command functions
 function sendRaceInvite(clientId) {
-    // You'll need to update this with your actual server IP and port
+    const serverSelect = document.getElementById(`server-select-${clientId}`);
+    const selectedServerIp = serverSelect.value;
+    
+    if (!selectedServerIp) {
+        alert('Please select a race server first');
+        return;
+    }
+    
     const raceInviteCommand = {
         script_name: "start-process.ahk",
         args: [
-            "C:/Users/gideon/Documents/Content Manager.exe acmanager://race/online/join?ip=192.168.1.211&httpPort=8081"
+            `C:/Users/gideon/Documents/Content Manager.exe acmanager://race/online/join?ip=${selectedServerIp}&httpPort=8081`
         ]
     };
     sendCommand(clientId, raceInviteCommand);

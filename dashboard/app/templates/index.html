@@ -17,11 +17,25 @@
         </div>
     </div>
 
-    <div class="add-client">
-        <h3>Add New Client</h3>
-        <input type="text" id="client-name" placeholder="Client Name">
-        <input type="text" id="client-ip" placeholder="IP Address (e.g., 192.168.1.100)">
-        <button onclick="addClient()">Add Client</button>
+    <div class="management-section">
+        <div class="add-client">
+            <h3>Add New Client</h3>
+            <input type="text" id="client-name" placeholder="Client Name">
+            <input type="text" id="client-ip" placeholder="IP Address (e.g., 192.168.1.100)">
+            <button onclick="addClient()">Add Client</button>
+        </div>
+
+        <div class="add-server">
+            <h3>Race Servers</h3>
+            <div class="server-inputs">
+                <input type="text" id="server-name" placeholder="Server Name">
+                <input type="text" id="server-ip" placeholder="Server IP (e.g., 192.168.1.211)">
+                <button onclick="addRaceServer()">Add Server</button>
+            </div>
+            <div id="servers-container" class="servers-list">
+                <!-- Race servers will be dynamically generated here -->
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
