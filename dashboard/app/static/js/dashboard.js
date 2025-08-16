@@ -235,8 +235,11 @@ function addRaceServer() {
 }
 
 function removeRaceServer(serverId) {
+    console.log('removeRaceServer called with ID:', serverId);
+    console.log('Current servers:', raceServers);
     if (confirm('Are you sure you want to remove this race server?')) {
-        raceServers = raceServers.filter(s => s.id !== serverId);
+        raceServers = raceServers.filter(s => s.id != serverId); // Use != instead of !== for type coercion
+        console.log('Servers after removal:', raceServers);
         saveRaceServers();
         renderRaceServers();
         updateAllServerSelects();
