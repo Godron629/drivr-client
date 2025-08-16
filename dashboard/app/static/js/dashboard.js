@@ -21,6 +21,14 @@ function saveClients() {
     localStorage.setItem('assettoClients', JSON.stringify(clients));
 }
 
+function updateNickname(clientId, nickname) {
+    const client = clients.find(c => c.id == clientId);
+    if (client) {
+        client.nickname = nickname;
+        saveClients();
+    }
+}
+
 function loadRaceServers() {
     const savedServers = localStorage.getItem('assettoRaceServers');
     if (savedServers) {
@@ -50,7 +58,8 @@ function addClient() {
     const client = {
         id: Date.now(),
         name: name,
-        ip: ip
+        ip: ip,
+        nickname: ''
     };
     
     clients.push(client);
@@ -63,8 +72,11 @@ function addClient() {
 }
 
 function removeClient(clientId) {
+    console.log('removeClient called with ID:', clientId);
+    console.log('Current clients:', clients);
     if (confirm('Are you sure you want to remove this client?')) {
-        clients = clients.filter(c => c.id !== clientId);
+        clients = clients.filter(c => c.id != clientId); // Use != instead of !== for type coercion
+        console.log('Clients after removal:', clients);
         saveClients();
         renderClients();
     }
@@ -96,6 +108,12 @@ function createClientBox(client) {
             <div>
                 <div class="client-name">${client.name}</div>
                 <div class="client-ip">${client.ip}:5000</div>
+                <div class="nickname-section">
+                    <input type="text" class="nickname-input" id="nickname-${client.id}" 
+                           placeholder="Driver nickname..." 
+                           value="${client.nickname || ''}"
+                           onchange="updateNickname('${client.id}', this.value)">
+                </div>
             </div>
         </div>
         
@@ -106,11 +124,20 @@ function createClientBox(client) {
             <button class="btn btn-primary" onclick="sendRaceInvite('${client.id}')">
                 Race Invite
             </button>
+            <button class="btn btn-primary" onclick="acceptInvite('${client.id}')">
+                Accept Invite
+            </button>
             <button class="btn btn-secondary" onclick="toggleRacingLine('${client.id}')">
                 Racing Line
             </button>
             <button class="btn btn-secondary" onclick="toggleTractionControl('${client.id}')">
                 Traction Control
+            </button>
+            <button class="btn btn-secondary" onclick="toggleABS('${client.id}')">
+                ABS
+            </button>
+            <button class="btn btn-secondary" onclick="toggleTransmission('${client.id}')">
+                Auto/Manual
             </button>
             <button class="btn btn-danger" onclick="stopAssetto('${client.id}')">
                 Stop Assetto
@@ -296,6 +323,30 @@ function toggleTractionControl(clientId) {
         args: ["acs.exe", "^t"]
     };
     sendCommand(clientId, tractionControlCommand);
+}
+
+function toggleABS(clientId) {
+    const absCommand = {
+        script_name: "send-keystroke.ahk",
+        args: ["acs.exe", "^a"]
+    };
+    sendCommand(clientId, absCommand);
+}
+
+function toggleTransmission(clientId) {
+    const transmissionCommand = {
+        script_name: "send-keystroke.ahk",
+        args: ["acs.exe", "^g"]
+    };
+    sendCommand(clientId, transmissionCommand);
+}
+
+function acceptInvite(clientId) {
+    const acceptInviteCommand = {
+        script_name: "send-keystroke.ahk",
+        args: ["Content Manager.exe", "^g"]
+    };
+    sendCommand(clientId, acceptInviteCommand);
 }
 
 function stopAssetto(clientId) {
