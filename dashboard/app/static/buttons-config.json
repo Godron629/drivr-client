@@ -47,16 +47,6 @@
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "!{f4}"],
       "requires_server": false
-    },
-    {
-      "id": "remove_client",
-      "label": "Remove Client",
-      "type": "danger",
-      "script": null,
-      "args": [],
-      "requires_server": false,
-      "special": "remove_client",
-      "full_width": true
     }
   ]
 }

@@ -2,15 +2,16 @@
 let clients = [];
 let raceServers = [];
 let buttonsConfig = null;
+let clientsConfig = null;
 
 // Health monitoring
 let healthCheckInterval = null;
 const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
 
-// Load clients from localStorage on page load
+// Load clients from config file on page load
 document.addEventListener('DOMContentLoaded', async function() {
     await loadButtonsConfig();
-    loadClients();
+    await loadClientsConfig();
     loadRaceServers();
     renderClients();
     renderRaceServers();
@@ -29,22 +30,31 @@ async function loadButtonsConfig() {
     }
 }
 
-function loadClients() {
-    const savedClients = localStorage.getItem('assettoClients');
-    if (savedClients) {
-        clients = JSON.parse(savedClients);
+async function loadClientsConfig() {
+    try {
+        const response = await fetch('/static/clients-config.json');
+        clientsConfig = await response.json();
+        console.log('Loaded clients config:', clientsConfig);
+        
+        // Convert config clients to runtime clients with generated IDs and empty nicknames
+        clients = clientsConfig.clients.map((configClient, index) => ({
+            id: `client_${index}`,
+            name: configClient.name,
+            ip: configClient.ip,
+            nickname: '',
+            status: 'unknown'
+        }));
+    } catch (error) {
+        console.error('Failed to load clients config:', error);
+        // Fallback to empty clients
+        clients = [];
     }
-}
-
-function saveClients() {
-    localStorage.setItem('assettoClients', JSON.stringify(clients));
 }
 
 function updateNickname(clientId, nickname) {
     const client = clients.find(c => c.id == clientId);
     if (client) {
         client.nickname = nickname;
-        saveClients();
     }
 }
 
@@ -59,48 +69,7 @@ function saveRaceServers() {
     localStorage.setItem('assettoRaceServers', JSON.stringify(raceServers));
 }
 
-function addClient() {
-    const name = document.getElementById('client-name').value.trim();
-    const ip = document.getElementById('client-ip').value.trim();
-    
-    if (!name || !ip) {
-        alert('Please enter both client name and IP address');
-        return;
-    }
-    
-    // Check if client already exists
-    if (clients.find(c => c.ip === ip)) {
-        alert('Client with this IP already exists');
-        return;
-    }
-    
-    const client = {
-        id: Date.now(),
-        name: name,
-        ip: ip,
-        nickname: '',
-        status: 'unknown' // 'online', 'offline', 'unknown'
-    };
-    
-    clients.push(client);
-    saveClients();
-    renderClients();
-    
-    // Clear input fields
-    document.getElementById('client-name').value = '';
-    document.getElementById('client-ip').value = '';
-}
 
-function removeClient(clientId) {
-    console.log('removeClient called with ID:', clientId);
-    console.log('Current clients:', clients);
-    if (confirm('Are you sure you want to remove this client?')) {
-        clients = clients.filter(c => c.id != clientId); // Use != instead of !== for type coercion
-        console.log('Clients after removal:', clients);
-        saveClients();
-        renderClients();
-    }
-}
 
 function renderClients() {
     const container = document.getElementById('clients-container');
@@ -237,8 +206,6 @@ async function sendCommand(clientId, command) {
     setTimeout(() => {
         statusDiv.style.display = 'none';
     }, hideTimeout);
-    
-    saveClients();
 }
 
 // Generic command handler for dynamic buttons
@@ -254,11 +221,6 @@ async function executeButtonCommand(clientId, buttonId) {
         return;
     }
     
-    // Handle special commands
-    if (button.special === 'remove_client') {
-        removeClient(clientId);
-        return;
-    }
     
     // Check if server selection is required
     if (button.requires_server) {
@@ -461,7 +423,6 @@ function updateClientStatus(clientId, status) {
     if (!client) return;
     
     client.status = status;
-    saveClients();
     
     const statusIndicator = document.getElementById(`status-indicator-${clientId}`);
     if (!statusIndicator) return;

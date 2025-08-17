@@ -4,8 +4,8 @@ Web interface for managing racing sim clients across your network.
 
 ## UI Overview
 
-**Client Cards**: Each connected sim setup appears as a card with control buttons  
-**Add New Client**: Form to register clients by name and IP address  
+**Client Cards**: Each sim setup appears as a card with control buttons  
+**Client Configuration**: Clients are loaded from `app/static/clients-config.json`  
 **Control Buttons**: Execute commands instantly on target machines
 
 ## Adding Custom Buttons
