@@ -1,0 +1,78 @@
+{
+  "buttons": [
+    {
+      "id": "race_invite",
+      "label": "Race Invite",
+      "type": "primary",
+      "script": "start-process.ahk",
+      "args": ["C:/Users/gideon/Documents/Content Manager.exe", "acmanager://race/online/join?ip={server_ip}&httpPort=8081"],
+      "requires_server": true,
+      "order": 1
+    },
+    {
+      "id": "accept_invite",
+      "label": "Accept Invite",
+      "type": "primary",
+      "script": "send-keystroke.ahk",
+      "args": ["Content Manager.exe", "^g"],
+      "requires_server": false,
+      "order": 2
+    },
+    {
+      "id": "racing_line",
+      "label": "Racing Line",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "^i"],
+      "requires_server": false,
+      "order": 3
+    },
+    {
+      "id": "traction_control",
+      "label": "Traction Control",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "^t"],
+      "requires_server": false,
+      "order": 4
+    },
+    {
+      "id": "abs",
+      "label": "ABS",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "^a"],
+      "requires_server": false,
+      "order": 5
+    },
+    {
+      "id": "transmission",
+      "label": "Auto/Manual",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "^g"],
+      "requires_server": false,
+      "order": 6
+    },
+    {
+      "id": "stop_assetto",
+      "label": "Stop Assetto",
+      "type": "danger",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "!{f4}"],
+      "requires_server": false,
+      "order": 7
+    },
+    {
+      "id": "remove_client",
+      "label": "Remove Client",
+      "type": "danger",
+      "script": null,
+      "args": [],
+      "requires_server": false,
+      "order": 8,
+      "special": "remove_client",
+      "full_width": true
+    }
+  ]
+}

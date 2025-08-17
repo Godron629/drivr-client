@@ -1,14 +1,28 @@
 // Store client configurations
 let clients = [];
 let raceServers = [];
+let buttonsConfig = null;
 
 // Load clients from localStorage on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadButtonsConfig();
     loadClients();
     loadRaceServers();
     renderClients();
     renderRaceServers();
 });
+
+async function loadButtonsConfig() {
+    try {
+        const response = await fetch('/static/buttons-config.json');
+        buttonsConfig = await response.json();
+        console.log('Loaded buttons config:', buttonsConfig);
+    } catch (error) {
+        console.error('Failed to load buttons config:', error);
+        // Fallback to empty config
+        buttonsConfig = { buttons: [] };
+    }
+}
 
 function loadClients() {
     const savedClients = localStorage.getItem('assettoClients');
@@ -99,9 +113,40 @@ function renderClients() {
 }
 
 function createClientBox(client) {
+    if (!buttonsConfig) {
+        console.error('Buttons config not loaded yet');
+        return document.createElement('div');
+    }
+    
     const box = document.createElement('div');
     box.className = 'client-box';
     box.id = `client-${client.id}`;
+    
+    // Generate buttons HTML dynamically
+    const sortedButtons = buttonsConfig.buttons
+        .sort((a, b) => a.order - b.order);
+    
+    let buttonsHTML = '';
+    
+    // Add server select for buttons that require it
+    const hasServerRequiredButtons = sortedButtons.some(btn => btn.requires_server);
+    if (hasServerRequiredButtons) {
+        buttonsHTML += `
+            <select id="server-select-${client.id}" class="server-select">
+                <option value="">Select Race Server</option>
+            </select>
+        `;
+    }
+    
+    // Generate buttons
+    sortedButtons.forEach(button => {
+        const btnClass = `btn btn-${button.type}${button.full_width ? ' btn-full' : ''}`;
+        buttonsHTML += `
+            <button class="${btnClass}" onclick="executeButtonCommand('${client.id}', '${button.id}')">
+                ${button.label}
+            </button>
+        `;
+    });
     
     box.innerHTML = `
         <div class="client-header">
@@ -118,33 +163,7 @@ function createClientBox(client) {
         </div>
         
         <div class="controls">
-            <select id="server-select-${client.id}" class="server-select">
-                <option value="">Select Race Server</option>
-            </select>
-            <button class="btn btn-primary" onclick="sendRaceInvite('${client.id}')">
-                Race Invite
-            </button>
-            <button class="btn btn-primary" onclick="acceptInvite('${client.id}')">
-                Accept Invite
-            </button>
-            <button class="btn btn-secondary" onclick="toggleRacingLine('${client.id}')">
-                Racing Line
-            </button>
-            <button class="btn btn-secondary" onclick="toggleTractionControl('${client.id}')">
-                Traction Control
-            </button>
-            <button class="btn btn-secondary" onclick="toggleABS('${client.id}')">
-                ABS
-            </button>
-            <button class="btn btn-secondary" onclick="toggleTransmission('${client.id}')">
-                Auto/Manual
-            </button>
-            <button class="btn btn-danger" onclick="stopAssetto('${client.id}')">
-                Stop Assetto
-            </button>
-            <button class="btn btn-danger btn-full" onclick="removeClient('${client.id}')">
-                Remove Client
-            </button>
+            ${buttonsHTML}
         </div>
         
         <div class="status-message" id="status-${client.id}" style="display: none;"></div>
@@ -199,6 +218,57 @@ async function sendCommand(clientId, command) {
     }, 3000);
     
     saveClients();
+}
+
+// Generic command handler for dynamic buttons
+async function executeButtonCommand(clientId, buttonId) {
+    if (!buttonsConfig) {
+        console.error('Buttons config not loaded');
+        return;
+    }
+    
+    const button = buttonsConfig.buttons.find(b => b.id === buttonId);
+    if (!button) {
+        console.error('Button not found:', buttonId);
+        return;
+    }
+    
+    // Handle special commands
+    if (button.special === 'remove_client') {
+        removeClient(clientId);
+        return;
+    }
+    
+    // Check if server selection is required
+    if (button.requires_server) {
+        const serverSelect = document.getElementById(`server-select-${clientId}`);
+        const selectedServerIp = serverSelect ? serverSelect.value : '';
+        
+        if (!selectedServerIp) {
+            alert('Please select a race server first');
+            return;
+        }
+        
+        // Replace {server_ip} placeholder in args
+        const processedArgs = button.args.map(arg => 
+            arg.replace('{server_ip}', selectedServerIp)
+        );
+        
+        const command = {
+            script_name: button.script,
+            args: processedArgs
+        };
+        
+        sendCommand(clientId, command);
+    } else {
+        // Regular command without server dependency
+        const command = {
+            script_name: button.script,
+            args: button.args
+        };
+        
+        sendCommand(clientId, command);
+    }
 }
 
 function addRaceServer() {
@@ -291,71 +361,3 @@ function updateServerSelect(selectElement) {
     }
 }
 
-
-// Command functions
-function sendRaceInvite(clientId) {
-    const serverSelect = document.getElementById(`server-select-${clientId}`);
-    const selectedServerIp = serverSelect.value;
-    
-    if (!selectedServerIp) {
-        alert('Please select a race server first');
-        return;
-    }
-    
-    const raceInviteCommand = {
-        script_name: "start-process.ahk",
-        args: [
-            `C:/Users/gideon/Documents/Content Manager.exe acmanager://race/online/join?ip=${selectedServerIp}&httpPort=8081`
-        ]
-    };
-    sendCommand(clientId, raceInviteCommand);
-}
-
-function toggleRacingLine(clientId) {
-    const racingLineCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["acs.exe", "^i"]
-    };
-    sendCommand(clientId, racingLineCommand);
-}
-
-function toggleTractionControl(clientId) {
-    // Assuming some keystroke for traction control - you may need to adjust this
-    const tractionControlCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["acs.exe", "^t"]
-    };
-    sendCommand(clientId, tractionControlCommand);
-}
-
-function toggleABS(clientId) {
-    const absCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["acs.exe", "^a"]
-    };
-    sendCommand(clientId, absCommand);
-}
-
-function toggleTransmission(clientId) {
-    const transmissionCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["acs.exe", "^g"]
-    };
-    sendCommand(clientId, transmissionCommand);
-}
-
-function acceptInvite(clientId) {
-    const acceptInviteCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["Content Manager.exe", "^g"]
-    };
-    sendCommand(clientId, acceptInviteCommand);
-}
-
-function stopAssetto(clientId) {
-    const stopCommand = {
-        script_name: "send-keystroke.ahk",
-        args: ["acs.exe", "!{f4}"]
-    };
-    sendCommand(clientId, stopCommand);
-}
