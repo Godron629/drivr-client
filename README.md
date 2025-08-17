@@ -2,7 +2,7 @@
 
 A generic control system for interacting with sim rigs through a centralized web dashboard.
 
-![RaceLink](assets/drivr.png)
+![RaceLink](assets/racelink.png)
 
 ## Components
 
