@@ -3,6 +3,10 @@ let clients = [];
 let raceServers = [];
 let buttonsConfig = null;
 
+// Health monitoring
+let healthCheckInterval = null;
+const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
+
 // Load clients from localStorage on page load
 document.addEventListener('DOMContentLoaded', async function() {
     await loadButtonsConfig();
@@ -10,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadRaceServers();
     renderClients();
     renderRaceServers();
+    startHealthMonitoring();
 });
 
 async function loadButtonsConfig() {
@@ -73,7 +78,8 @@ function addClient() {
         id: Date.now(),
         name: name,
         ip: ip,
-        nickname: ''
+        nickname: '',
+        status: 'unknown' // 'online', 'offline', 'unknown'
     };
     
     clients.push(client);
@@ -109,6 +115,9 @@ function renderClients() {
         if (select) {
             updateServerSelect(select);
         }
+        
+        // Update status indicator
+        updateClientStatus(client.id, client.status || 'unknown');
     });
 }
 
@@ -150,7 +159,10 @@ function createClientBox(client) {
     box.innerHTML = `
         <div class="client-header">
             <div>
-                <div class="client-name">${client.name}</div>
+                <div class="client-name">
+                    ${client.name}
+                    <span class="status-indicator" id="status-indicator-${client.id}" title="Client status"></span>
+                </div>
                 <div class="client-ip">${client.ip}:5000</div>
                 <div class="nickname-section">
                     <input type="text" class="nickname-input" id="nickname-${client.id}" 
@@ -177,6 +189,19 @@ async function sendCommand(clientId, command) {
     
     const clientBox = document.getElementById(`client-${clientId}`);
     const statusDiv = document.getElementById(`status-${clientId}`);
+    
+    // Check if client is offline
+    if (client.status === 'offline') {
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'status-message status-error';
+        statusDiv.textContent = 'Cannot send command: Client is offline';
+        
+        // Hide status message after 3 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 3000);
+        return;
+    }
     
     // Show loading state
     clientBox.classList.add('loading');
@@ -206,6 +231,9 @@ async function sendCommand(clientId, command) {
         statusDiv.className = 'status-message status-error';
         statusDiv.textContent = `Failed to connect to client: ${error.message}`;
         console.error('Connection error:', error);
+        
+        // Update client status to offline on connection failure
+        updateClientStatus(clientId, 'offline');
     }
     
     // Remove loading state
@@ -358,5 +386,80 @@ function updateServerSelect(selectElement) {
     if (currentValue && raceServers.find(s => s.ip === currentValue)) {
         selectElement.value = currentValue;
     }
+}
+
+// Health monitoring functions
+function startHealthMonitoring() {
+    if (healthCheckInterval) {
+        clearInterval(healthCheckInterval);
+    }
+    
+    // Initial health check
+    checkAllClientsHealth();
+    
+    // Set up periodic health checks
+    healthCheckInterval = setInterval(checkAllClientsHealth, HEALTH_CHECK_INTERVAL);
+}
+
+function stopHealthMonitoring() {
+    if (healthCheckInterval) {
+        clearInterval(healthCheckInterval);
+        healthCheckInterval = null;
+    }
+}
+
+async function checkAllClientsHealth() {
+    for (const client of clients) {
+        await checkClientHealth(client.id);
+    }
+}
+
+async function checkClientHealth(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    if (!client) return;
+    
+    const statusIndicator = document.getElementById(`status-indicator-${clientId}`);
+    if (!statusIndicator) return;
+    
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
+        const response = await fetch(`http://${client.ip}:5000/health`, {
+            method: 'GET',
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+            updateClientStatus(clientId, 'online');
+        } else {
+            updateClientStatus(clientId, 'offline');
+        }
+    } catch (error) {
+        updateClientStatus(clientId, 'offline');
+    }
+}
+
+function updateClientStatus(clientId, status) {
+    const client = clients.find(c => c.id == clientId);
+    if (!client) return;
+    
+    client.status = status;
+    saveClients();
+    
+    const statusIndicator = document.getElementById(`status-indicator-${clientId}`);
+    if (!statusIndicator) return;
+    
+    // Remove existing status classes
+    statusIndicator.classList.remove('status-online', 'status-offline', 'status-unknown');
+    
+    // Add appropriate status class
+    statusIndicator.classList.add(`status-${status}`);
+    
+    // Update title attribute for tooltip
+    const statusText = status === 'online' ? 'Online' : status === 'offline' ? 'Offline' : 'Unknown';
+    statusIndicator.title = `Client status: ${statusText}`;
 }
 
