@@ -2,6 +2,8 @@
 
 A system for remotely controlling multiple Assetto Corsa client setups through a web dashboard.
 
+![DriVR Control Dashboard](assets/drivr.png)
+
 ## Components
 
 - **Client** (`client/`): Flask server that runs on each sim setup, executes AutoHotkey scripts
