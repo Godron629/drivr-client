@@ -25,27 +25,19 @@
       "requires_server": false
     },
     {
-      "id": "traction_control",
-      "label": "Traction Control",
-      "type": "secondary",
-      "script": "send-keystroke.ahk",
-      "args": ["acs.exe", "^t"],
-      "requires_server": false
-    },
-    {
-      "id": "abs",
-      "label": "ABS",
-      "type": "secondary",
-      "script": "send-keystroke.ahk",
-      "args": ["acs.exe", "^a"],
-      "requires_server": false
-    },
-    {
       "id": "transmission",
       "label": "Auto/Manual",
       "type": "secondary",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "^g"],
+      "requires_server": false
+    },
+      {
+      "id": "full_screen",
+      "label": "Fullscreen",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "!{enter}"],
       "requires_server": false
     },
     {

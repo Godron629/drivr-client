@@ -44,9 +44,8 @@ def run():
             "stderr": e.stderr
         }), 400
     except FileNotFoundError:
-        return jsonify({"error": f"AutoHotkey executable not found at '{AHK_EXE}'"}), 404
+        return jsonify({"error": f"AutoHotkey executable not found at '{config.AHK_EXE}'"}), 404
 
-{
-    "script_name": "send-keystrokes.ahk",
-    "arguments": ["abc"]
-}
+@command_bp.route("/health", methods=["GET"])
+def health():
+    return {"status": "ok"}, 200
