@@ -12,13 +12,14 @@ A system for remotely controlling multiple Assetto Corsa client setups through a
 
 ## Quick Start
 
-### 1. Setup Client (on each sim setup)
+### 1. Start Client (on each sim setup)
+
+* Install [AutoHotkey (AHK)](https://www.autohotkey.com/).
 
 ```sh
-cd client
-python -m venv venv
-.\venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt 
+
+cd client 
 
 // Set environment variables (PowerShell)
 $env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
@@ -31,7 +32,6 @@ python run.py
 
 ```sh
 cd dashboard
-pip install -r requirements.txt
 
 // Run dashboard (port 8080)
 python run.py
@@ -40,59 +40,3 @@ python run.py
 ### 3. Access Dashboard
 Open browser to `http://localhost:8080` and add your client IPs to start controlling them.
 
-## Pre-requisites
-* Install [AutoHotkey (AHK)](https://www.autohotkey.com/) on each client machine
-
-# Example Requests
-
-### Close Assetto Corsa
-```
-curl --location 'http://127.0.0.1:5000/run' \
---header 'Content-Type: application/json' \
---data '{
-    "script_name": "send-keystroke.ahk", 
-    "args": ["acs.exe", "!{f4}"]
-}'
-```
-
-### Turn on racing line 
-```
-curl --location 'http://127.0.0.1:5000/run' \
---header 'Content-Type: application/json' \
---data '{
-    "script_name": "send-keystroke.ahk", 
-    "args": ["acs.exe", "^i"]
-}'
-```
-
-### Send race invite 
-```
-curl --location 'http://127.0.0.1:5000/run' \
---header 'Content-Type: application/json' \
---data '{
-    "script_name": "start-process.ahk",
-    "args": [
-        "C:/Users/gideon/Documents/Content Manager.exe acmanager://race/online/join?ip=192.168.1.211&httpPort=8081"
-    ]
-}
-'
-```
-
-# Example Errors 
-
-Sending a keystroke to a process that doesn't exist
-
-```
-// Request body 
-{
-    "script_name": "send-keystroke.ahk", 
-    "args": ["acs.exe", "^i"]
-}
-
-// Response
-{
-    "status": "error",
-    "stderr": "Process Content Manager.exe is not running.",
-    "stdout": ""
-}
-```
