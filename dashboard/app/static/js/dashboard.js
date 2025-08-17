@@ -35,6 +35,10 @@ async function loadClientsConfig() {
         clientsConfig = await response.json();
         console.log('Loaded clients config:', clientsConfig);
         
+        // Check localStorage for saved assignments
+        const savedAssignments = localStorage.getItem('clientAssignments');
+        const assignments = savedAssignments ? JSON.parse(savedAssignments) : {};
+        
         // Convert config clients to runtime clients with generated IDs and empty nicknames
         clients = clientsConfig.clients.map((configClient, index) => ({
             id: `client_${index}`,
@@ -42,7 +46,7 @@ async function loadClientsConfig() {
             ip: configClient.ip,
             nickname: '',
             status: 'unknown',
-            selectedServer: null
+            selectedServer: assignments[`client_${index}`] || configClient.selectedServer
         }));
     } catch (error) {
         console.error('Failed to load clients config:', error);
@@ -79,12 +83,32 @@ function updateNickname(clientId, nickname) {
     }
 }
 
-function updateClientServer(clientId, serverValue) {
+async function updateClientServer(clientId, serverValue) {
     const client = clients.find(c => c.id == clientId);
     if (client) {
         client.selectedServer = serverValue || null;
+        
+        // Save assignments to localStorage
+        await saveClientsConfig();
+        
         // Re-render to update grouping
         renderClients();
+    }
+}
+
+async function saveClientsConfig() {
+    try {
+        // Save just the assignments to localStorage
+        const assignments = {};
+        clients.forEach(client => {
+            if (client.selectedServer) {
+                assignments[client.id] = client.selectedServer;
+            }
+        });
+        localStorage.setItem('clientAssignments', JSON.stringify(assignments));
+        console.log('Saved client assignments to localStorage');
+    } catch (error) {
+        console.error('Error saving client assignments:', error);
     }
 }
 
@@ -110,7 +134,7 @@ function renderClients() {
     // Group clients by their selected server
     clients.forEach(client => {
         if (client.selectedServer) {
-            const server = raceServers.find(s => `${s.ip}:${s.port || '9600'}` === client.selectedServer);
+            const server = raceServers.find(s => s.id == client.selectedServer);
             if (server) {
                 const serverKey = client.selectedServer;
                 if (!clientsByServer.has(serverKey)) {
@@ -305,19 +329,20 @@ async function executeButtonCommand(clientId, buttonId) {
             return;
         }
         
-        // Extract IP and port from "ip:port" format
-        const [selectedServerIp, selectedServerPort] = selectedServerValue.split(':');
+        // Find the selected server by ID
+        const selectedServer = raceServers.find(s => s.id == selectedServerValue);
         
-        // Find the selected server to get the password
-        const selectedServer = raceServers.find(s => 
-            `${s.ip}:${s.port || '9600'}` === selectedServerValue
-        );
-        const selectedServerPassword = selectedServer ? selectedServer.password || '' : '';
+        if (!selectedServer) {
+            alert('Selected server not found');
+            return;
+        }
+        
+        const selectedServerPassword = selectedServer.password || '';
         
         // Replace {server_ip}, {server_port}, and {server_password} placeholders in args
         const processedArgs = button.args.map(arg => 
-            arg.replace('{server_ip}', selectedServerIp)
-              .replace('{server_port}', selectedServerPort || '9600')
+            arg.replace('{server_ip}', selectedServer.ip)
+              .replace('{server_port}', selectedServer.port || '9600')
               .replace('{server_password}', selectedServerPassword)
         );
         
@@ -372,13 +397,13 @@ function updateServerSelect(selectElement) {
     // Add all race servers
     raceServers.forEach(server => {
         const option = document.createElement('option');
-        option.value = `${server.ip}:${server.port || '9600'}`;
+        option.value = server.id;
         option.textContent = `${server.name} (${server.ip}:${server.port || '9600'})`;
         selectElement.appendChild(option);
     });
     
     // Restore selection if it still exists
-    if (currentValue && raceServers.find(s => `${s.ip}:${s.port || '9600'}` === currentValue)) {
+    if (currentValue && raceServers.find(s => s.id == currentValue)) {
         selectElement.value = currentValue;
     }
 }

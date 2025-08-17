@@ -2,11 +2,13 @@
   "clients": [
     {
       "name": "Gaming PC 1",
-      "ip": "192.168.1.211"
+      "ip": "192.168.1.211",
+      "selectedServer": null
     },
     {
       "name": "Gaming PC 2",
-      "ip": "192.168.1.101"
+      "ip": "192.168.1.101",
+      "selectedServer": null
     }
   ]
 }
