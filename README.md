@@ -2,7 +2,7 @@
 
 Remote control multiple racing sim setups from a single web dashboard. Send commands, toggle settings, and manage racing sessions across your network.
 
-![RaceLink](assets/racelink.png)
+![RaceDirector](assets/racedirector.png)
 
 ## How It Works
 
