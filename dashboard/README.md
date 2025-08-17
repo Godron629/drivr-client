@@ -5,13 +5,13 @@ Web interface for managing racing sim clients across your network.
 ## UI Overview
 
 **Client Cards**: Each sim setup appears as a card with control buttons  
-**Client Configuration**: Clients are loaded from `app/static/clients-config.json`  
-**Server Configuration**: Race servers are loaded from `app/static/servers-config.json`  
+**Client Configuration**: Clients are loaded from `config/clients.json`  
+**Server Configuration**: Race servers are loaded from `config/servers.json`  
 **Control Buttons**: Execute commands instantly on target machines
 
 ## Adding Custom Buttons
 
-Edit `app/static/buttons-config.json` to add new commands:
+Edit `config/buttons.json` to add new commands:
 
 ```json
 {
@@ -31,11 +31,12 @@ Buttons load automatically on refresh.
 
 ## Configuration Files
 
-**clients-config.json**: Define sim rigs with name, IP address, and selected server
+**clients.json**: Define sim rigs with ID, name, IP address, and selected server
 ```json
 {
   "clients": [
     {
+      "id": 1,
       "name": "Rig 6",
       "ip": "192.168.1.106", 
       "selectedServer": null
@@ -44,7 +45,7 @@ Buttons load automatically on refresh.
 }
 ```
 
-**servers-config.json**: Define available race servers with connection details
+**servers.json**: Define available race servers with connection details
 ```json
 {
   "servers": [

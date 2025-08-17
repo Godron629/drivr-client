@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadButtonsConfig() {
     try {
-        const response = await fetch('/static/buttons-config.json');
+        const response = await fetch('/config/buttons.json');
         buttonsConfig = await response.json();
         console.log('Loaded buttons config:', buttonsConfig);
     } catch (error) {
@@ -31,7 +31,7 @@ async function loadButtonsConfig() {
 
 async function loadClientsConfig() {
     try {
-        const response = await fetch('/static/clients-config.json');
+        const response = await fetch('/config/clients.json');
         clientsConfig = await response.json();
         console.log('Loaded clients config:', clientsConfig);
         
@@ -41,14 +41,14 @@ async function loadClientsConfig() {
         const savedNicknames = localStorage.getItem('clientNicknames');
         const nicknames = savedNicknames ? JSON.parse(savedNicknames) : {};
         
-        // Convert config clients to runtime clients with generated IDs and empty nicknames
-        clients = clientsConfig.clients.map((configClient, index) => ({
-            id: `client_${index}`,
+        // Convert config clients to runtime clients using their IDs
+        clients = clientsConfig.clients.map((configClient) => ({
+            id: configClient.id,
             name: configClient.name,
             ip: configClient.ip,
-            nickname: nicknames[`client_${index}`] || '',
+            nickname: nicknames[configClient.id] || '',
             status: 'unknown',
-            selectedServer: assignments[`client_${index}`] || configClient.selectedServer
+            selectedServer: assignments[configClient.id] || configClient.selectedServer
         }));
     } catch (error) {
         console.error('Failed to load clients config:', error);
@@ -59,13 +59,13 @@ async function loadClientsConfig() {
 
 async function loadServersConfig() {
     try {
-        const response = await fetch('/static/servers-config.json');
+        const response = await fetch('/config/servers.json');
         const serversConfig = await response.json();
         console.log('Loaded servers config:', serversConfig);
         
-        // Convert config servers to runtime servers with generated IDs
-        raceServers = serversConfig.servers.map((configServer, index) => ({
-            id: `server_${index}`,
+        // Convert config servers to runtime servers using their IDs
+        raceServers = serversConfig.servers.map((configServer) => ({
+            id: configServer.id,
             name: configServer.name,
             ip: configServer.ip,
             port: configServer.port || '9600',
