@@ -12,7 +12,7 @@ const HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
 document.addEventListener('DOMContentLoaded', async function() {
     await loadButtonsConfig();
     await loadClientsConfig();
-    loadRaceServers();
+    await loadServersConfig();
     renderClients();
     renderRaceServers();
     startHealthMonitoring();
@@ -51,6 +51,27 @@ async function loadClientsConfig() {
     }
 }
 
+async function loadServersConfig() {
+    try {
+        const response = await fetch('/static/servers-config.json');
+        const serversConfig = await response.json();
+        console.log('Loaded servers config:', serversConfig);
+        
+        // Convert config servers to runtime servers with generated IDs
+        raceServers = serversConfig.servers.map((configServer, index) => ({
+            id: `server_${index}`,
+            name: configServer.name,
+            ip: configServer.ip,
+            port: configServer.port || '9600',
+            password: configServer.password || ''
+        }));
+    } catch (error) {
+        console.error('Failed to load servers config:', error);
+        // Fallback to empty servers
+        raceServers = [];
+    }
+}
+
 function updateNickname(clientId, nickname) {
     const client = clients.find(c => c.id == clientId);
     if (client) {
@@ -58,16 +79,6 @@ function updateNickname(clientId, nickname) {
     }
 }
 
-function loadRaceServers() {
-    const savedServers = localStorage.getItem('assettoRaceServers');
-    if (savedServers) {
-        raceServers = JSON.parse(savedServers);
-    }
-}
-
-function saveRaceServers() {
-    localStorage.setItem('assettoRaceServers', JSON.stringify(raceServers));
-}
 
 
 
@@ -265,59 +276,6 @@ async function executeButtonCommand(clientId, buttonId) {
     }
 }
 
-function addRaceServer() {
-    const name = document.getElementById('server-name').value.trim();
-    const ip = document.getElementById('server-ip').value.trim();
-    const port = document.getElementById('server-port').value.trim();
-    const password = document.getElementById('server-password').value.trim();
-    
-    if (!name || !ip) {
-        alert('Please enter both server name and IP address');
-        return;
-    }
-    
-    // Use default port 9600 if not specified
-    const serverPort = port || '9600';
-    
-    // Check if server already exists (by IP and port combination)
-    if (raceServers.find(s => s.ip === ip && s.port === serverPort)) {
-        alert('Server with this IP and port already exists');
-        return;
-    }
-    
-    const server = {
-        id: Date.now(),
-        name: name,
-        ip: ip,
-        port: serverPort,
-        password: password || '' // Optional password
-    };
-    
-    raceServers.push(server);
-    saveRaceServers();
-    renderRaceServers();
-    
-    // Clear input fields
-    document.getElementById('server-name').value = '';
-    document.getElementById('server-ip').value = '';
-    document.getElementById('server-port').value = '';
-    document.getElementById('server-password').value = '';
-    
-    // Update all client dropdowns
-    updateAllServerSelects();
-}
-
-function removeRaceServer(serverId) {
-    console.log('removeRaceServer called with ID:', serverId);
-    console.log('Current servers:', raceServers);
-    if (confirm('Are you sure you want to remove this race server?')) {
-        raceServers = raceServers.filter(s => s.id != serverId); // Use != instead of !== for type coercion
-        console.log('Servers after removal:', raceServers);
-        saveRaceServers();
-        renderRaceServers();
-        updateAllServerSelects();
-    }
-}
 
 function renderRaceServers() {
     const container = document.getElementById('servers-container');
@@ -328,7 +286,6 @@ function renderRaceServers() {
         serverItem.className = 'server-item';
         serverItem.innerHTML = `
             <span>${server.name} (${server.ip}:${server.port || '9600'})</span>
-            <button class="btn btn-danger btn-small" onclick="removeRaceServer('${server.id}')">Remove</button>
         `;
         container.appendChild(serverItem);
     });
