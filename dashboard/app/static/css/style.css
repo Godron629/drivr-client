@@ -193,6 +193,7 @@ body {
     width: 220px;
     padding: 12px 15px;
     margin-right: 12px;
+    margin-bottom: 12px;
     border: 1px solid rgba(52, 152, 219, 0.3);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.8);

@@ -232,10 +232,11 @@ async function sendCommand(clientId, command) {
     // Remove loading state
     clientBox.classList.remove('loading');
     
-    // Hide status message after 3 seconds
+    // Hide status message after longer duration for errors, shorter for success
+    const hideTimeout = statusDiv.className.includes('status-error') ? 8000 : 3000;
     setTimeout(() => {
         statusDiv.style.display = 'none';
-    }, 3000);
+    }, hideTimeout);
     
     saveClients();
 }
@@ -262,16 +263,27 @@ async function executeButtonCommand(clientId, buttonId) {
     // Check if server selection is required
     if (button.requires_server) {
         const serverSelect = document.getElementById(`server-select-${clientId}`);
-        const selectedServerIp = serverSelect ? serverSelect.value : '';
+        const selectedServerValue = serverSelect ? serverSelect.value : '';
         
-        if (!selectedServerIp) {
+        if (!selectedServerValue) {
             alert('Please select a race server first');
             return;
         }
         
-        // Replace {server_ip} placeholder in args
+        // Extract IP and port from "ip:port" format
+        const [selectedServerIp, selectedServerPort] = selectedServerValue.split(':');
+        
+        // Find the selected server to get the password
+        const selectedServer = raceServers.find(s => 
+            `${s.ip}:${s.port || '9600'}` === selectedServerValue
+        );
+        const selectedServerPassword = selectedServer ? selectedServer.password || '' : '';
+        
+        // Replace {server_ip}, {server_port}, and {server_password} placeholders in args
         const processedArgs = button.args.map(arg => 
             arg.replace('{server_ip}', selectedServerIp)
+              .replace('{server_port}', selectedServerPort || '9600')
+              .replace('{server_password}', selectedServerPassword)
         );
         
         const command = {
@@ -294,22 +306,29 @@ async function executeButtonCommand(clientId, buttonId) {
 function addRaceServer() {
     const name = document.getElementById('server-name').value.trim();
     const ip = document.getElementById('server-ip').value.trim();
+    const port = document.getElementById('server-port').value.trim();
+    const password = document.getElementById('server-password').value.trim();
     
     if (!name || !ip) {
         alert('Please enter both server name and IP address');
         return;
     }
     
-    // Check if server already exists
-    if (raceServers.find(s => s.ip === ip)) {
-        alert('Server with this IP already exists');
+    // Use default port 9600 if not specified
+    const serverPort = port || '9600';
+    
+    // Check if server already exists (by IP and port combination)
+    if (raceServers.find(s => s.ip === ip && s.port === serverPort)) {
+        alert('Server with this IP and port already exists');
         return;
     }
     
     const server = {
         id: Date.now(),
         name: name,
-        ip: ip
+        ip: ip,
+        port: serverPort,
+        password: password || '' // Optional password
     };
     
     raceServers.push(server);
@@ -319,6 +338,8 @@ function addRaceServer() {
     // Clear input fields
     document.getElementById('server-name').value = '';
     document.getElementById('server-ip').value = '';
+    document.getElementById('server-port').value = '';
+    document.getElementById('server-password').value = '';
     
     // Update all client dropdowns
     updateAllServerSelects();
@@ -344,7 +365,7 @@ function renderRaceServers() {
         const serverItem = document.createElement('div');
         serverItem.className = 'server-item';
         serverItem.innerHTML = `
-            <span>${server.name} (${server.ip})</span>
+            <span>${server.name} (${server.ip}:${server.port || '9600'})</span>
             <button class="btn btn-danger btn-small" onclick="removeRaceServer('${server.id}')">Remove</button>
         `;
         container.appendChild(serverItem);
@@ -370,13 +391,13 @@ function updateServerSelect(selectElement) {
     // Add all race servers
     raceServers.forEach(server => {
         const option = document.createElement('option');
-        option.value = server.ip;
-        option.textContent = `${server.name} (${server.ip})`;
+        option.value = `${server.ip}:${server.port || '9600'}`;
+        option.textContent = `${server.name} (${server.ip}:${server.port || '9600'})`;
         selectElement.appendChild(option);
     });
     
     // Restore selection if it still exists
-    if (currentValue && raceServers.find(s => s.ip === currentValue)) {
+    if (currentValue && raceServers.find(s => `${s.ip}:${s.port || '9600'}` === currentValue)) {
         selectElement.value = currentValue;
     }
 }
