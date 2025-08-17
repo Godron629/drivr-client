@@ -305,3 +305,15 @@ body {
     background: linear-gradient(135deg, #95a5a6, #7f8c8d);
     box-shadow: 0 0 8px rgba(127, 140, 141, 0.4);
 }
+
+/* Disabled button styles */
+.btn-disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.btn-disabled:hover {
+    transform: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}

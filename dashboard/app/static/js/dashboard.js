@@ -190,19 +190,6 @@ async function sendCommand(clientId, command) {
     const clientBox = document.getElementById(`client-${clientId}`);
     const statusDiv = document.getElementById(`status-${clientId}`);
     
-    // Check if client is offline
-    if (client.status === 'offline') {
-        statusDiv.style.display = 'block';
-        statusDiv.className = 'status-message status-error';
-        statusDiv.textContent = 'Cannot send command: Client is offline';
-        
-        // Hide status message after 3 seconds
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 3000);
-        return;
-    }
-    
     // Show loading state
     clientBox.classList.add('loading');
     statusDiv.style.display = 'block';
@@ -210,13 +197,19 @@ async function sendCommand(clientId, command) {
     statusDiv.textContent = 'Sending command...';
     
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
         const response = await fetch(`http://${client.ip}:5000/run`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(command)
+            body: JSON.stringify(command),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         const result = await response.json();
         
@@ -461,5 +454,36 @@ function updateClientStatus(clientId, status) {
     // Update title attribute for tooltip
     const statusText = status === 'online' ? 'Online' : status === 'offline' ? 'Offline' : 'Unknown';
     statusIndicator.title = `Client status: ${statusText}`;
+    
+    // Update button states based on client status
+    updateClientButtonStates(clientId, status);
+}
+
+function updateClientButtonStates(clientId, status) {
+    const clientBox = document.getElementById(`client-${clientId}`);
+    if (!clientBox) return;
+    
+    const buttons = clientBox.querySelectorAll('.btn:not(.remove-btn)'); // Exclude remove button
+    const serverSelect = document.getElementById(`server-select-${clientId}`);
+    const nicknameInput = document.getElementById(`nickname-${clientId}`);
+    
+    const isOffline = status === 'offline';
+    
+    buttons.forEach(button => {
+        button.disabled = isOffline;
+        if (isOffline) {
+            button.classList.add('btn-disabled');
+        } else {
+            button.classList.remove('btn-disabled');
+        }
+    });
+    
+    // Disable/enable server select and nickname input too
+    if (serverSelect) {
+        serverSelect.disabled = isOffline;
+    }
+    if (nicknameInput) {
+        nicknameInput.disabled = isOffline;
+    }
 }
 
