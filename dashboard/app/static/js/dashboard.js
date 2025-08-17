@@ -189,7 +189,17 @@ function renderClients() {
         
         const serverHeader = document.createElement('div');
         serverHeader.className = 'server-group-header';
-        serverHeader.innerHTML = `<h3>${serverGroup.name}</h3>`;
+        
+        // Get server IP and port for display
+        let serverTitle = serverGroup.name;
+        if (serverKey !== 'unassigned') {
+            const server = raceServers.find(s => s.id == serverKey);
+            if (server) {
+                serverTitle = `${serverGroup.name} (${server.ip}:${server.port})`;
+            }
+        }
+        
+        serverHeader.innerHTML = `<h3>${serverTitle}</h3>`;
         serverContainer.appendChild(serverHeader);
         
         const clientsGrid = document.createElement('div');
