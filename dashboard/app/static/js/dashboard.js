@@ -147,6 +147,7 @@ function clearLocalStorage() {
 
 
 
+
 function renderClients() {
     const container = document.getElementById('clients-container');
     container.innerHTML = '';
