@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-usage := "Usage: start-process.ahk <PROCESS_NAME> <PROCESS_DIR>"
+usage := "Usage: start-process.ahk <PROCESS_NAME> [PROCESS_DIR] [PATH_PREFIX]"
 
 if A_Args.Length < 1 {
     FileAppend "Not enough arguments passed!`n" usage, "*"
@@ -9,8 +9,20 @@ if A_Args.Length < 1 {
 
 processName := A_Args[1]
 processDir := ""
+pathPrefix := ""
+
 if A_Args.Length > 1 {
     processDir := A_Args[2]
+}
+
+if A_Args.Length > 2 {
+    pathPrefix := A_Args[3]
+    ; Handle special path variables
+    if (pathPrefix = "A_MyDocuments") {
+        pathPrefix := A_MyDocuments
+    }
+    ; Prepend the path prefix to process name
+    processName := pathPrefix "\" processName
 }
 
 try {

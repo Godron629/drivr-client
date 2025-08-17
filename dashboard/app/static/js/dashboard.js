@@ -122,14 +122,13 @@ function createClientBox(client) {
     box.className = 'client-box';
     box.id = `client-${client.id}`;
     
-    // Generate buttons HTML dynamically
-    const sortedButtons = buttonsConfig.buttons
-        .sort((a, b) => a.order - b.order);
+    // Generate buttons HTML dynamically (order by array position)
+    const buttons = buttonsConfig.buttons;
     
     let buttonsHTML = '';
     
     // Add server select for buttons that require it
-    const hasServerRequiredButtons = sortedButtons.some(btn => btn.requires_server);
+    const hasServerRequiredButtons = buttons.some(btn => btn.requires_server);
     if (hasServerRequiredButtons) {
         buttonsHTML += `
             <select id="server-select-${client.id}" class="server-select">
@@ -139,7 +138,7 @@ function createClientBox(client) {
     }
     
     // Generate buttons
-    sortedButtons.forEach(button => {
+    buttons.forEach(button => {
         const btnClass = `btn btn-${button.type}${button.full_width ? ' btn-full' : ''}`;
         buttonsHTML += `
             <button class="${btnClass}" onclick="executeButtonCommand('${client.id}', '${button.id}')">

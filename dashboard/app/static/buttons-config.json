@@ -5,9 +5,8 @@
       "label": "Race Invite",
       "type": "primary",
       "script": "start-process.ahk",
-      "args": ["C:/Users/gideon/Documents/Content Manager.exe", "acmanager://race/online/join?ip={server_ip}&httpPort=8081"],
-      "requires_server": true,
-      "order": 1
+      "args": ["Content Manager.exe", "acmanager://race/online/join?ip={server_ip}&httpPort=8081", "A_MyDocuments"],
+      "requires_server": true
     },
     {
       "id": "accept_invite",
@@ -15,8 +14,7 @@
       "type": "primary",
       "script": "send-keystroke.ahk",
       "args": ["Content Manager.exe", "^g"],
-      "requires_server": false,
-      "order": 2
+      "requires_server": false
     },
     {
       "id": "racing_line",
@@ -24,8 +22,7 @@
       "type": "secondary",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "^i"],
-      "requires_server": false,
-      "order": 3
+      "requires_server": false
     },
     {
       "id": "traction_control",
@@ -33,8 +30,7 @@
       "type": "secondary",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "^t"],
-      "requires_server": false,
-      "order": 4
+      "requires_server": false
     },
     {
       "id": "abs",
@@ -42,8 +38,7 @@
       "type": "secondary",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "^a"],
-      "requires_server": false,
-      "order": 5
+      "requires_server": false
     },
     {
       "id": "transmission",
@@ -51,8 +46,7 @@
       "type": "secondary",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "^g"],
-      "requires_server": false,
-      "order": 6
+      "requires_server": false
     },
     {
       "id": "stop_assetto",
@@ -60,8 +54,15 @@
       "type": "danger",
       "script": "send-keystroke.ahk",
       "args": ["acs.exe", "!{f4}"],
-      "requires_server": false,
-      "order": 7
+      "requires_server": false
+    },
+    {
+      "id": "cycle_views",
+      "label": "Views",
+      "type": "secondary",
+      "script": "send-keystroke.ahk",
+      "args": ["acs.exe", "{f1}"],
+      "requires_server": false
     },
     {
       "id": "remove_client",
@@ -70,7 +71,6 @@
       "script": null,
       "args": [],
       "requires_server": false,
-      "order": 8,
       "special": "remove_client",
       "full_width": true
     }
