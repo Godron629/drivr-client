@@ -85,6 +85,52 @@ body {
     margin: 0;
 }
 
+.server-controls {
+    margin-top: var(--space-2);
+}
+
+.broadcast-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-light);
+    cursor: pointer;
+    user-select: none;
+}
+
+.broadcast-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 3px;
+    background: var(--color-white);
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+}
+
+.broadcast-checkbox:checked {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.broadcast-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    color: var(--color-white);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.broadcast-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .clients-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));

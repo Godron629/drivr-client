@@ -200,7 +200,20 @@ function renderClients() {
             }
         }
         
+        const serverControls = document.createElement('div');
+        serverControls.className = 'server-controls';
+        
+        if (serverKey !== 'unassigned' && serverGroup.clients.length > 1) {
+            serverControls.innerHTML = `
+                <label class="broadcast-toggle">
+                    <input type="checkbox" id="broadcast-${serverKey}" class="broadcast-checkbox">
+                    <span>Broadcast to all clients in this server</span>
+                </label>
+            `;
+        }
+        
         serverHeader.innerHTML = `<h3>${serverTitle}</h3>`;
+        serverHeader.appendChild(serverControls);
         serverContainer.appendChild(serverHeader);
         
         const clientsGrid = document.createElement('div');
@@ -362,6 +375,33 @@ async function executeButtonCommand(clientId, buttonId) {
         return;
     }
     
+    // Find the client to determine which server group it belongs to
+    const client = clients.find(c => c.id == clientId);
+    if (!client) {
+        console.error('Client not found:', clientId);
+        return;
+    }
+    
+    // Check if broadcast mode is enabled for this server group
+    const broadcastCheckbox = client.selectedServer ? document.getElementById(`broadcast-${client.selectedServer}`) : null;
+    const isBroadcastMode = broadcastCheckbox && broadcastCheckbox.checked;
+    
+    if (isBroadcastMode) {
+        // Send command to all clients in the same server group
+        const clientsInGroup = clients.filter(c => c.selectedServer === client.selectedServer);
+        for (const groupClient of clientsInGroup) {
+            await executeButtonCommandForClient(groupClient.id, buttonId);
+        }
+    } else {
+        // Send command to single client
+        await executeButtonCommandForClient(clientId, buttonId);
+    }
+}
+
+// Helper function to execute command for a specific client
+async function executeButtonCommandForClient(clientId, buttonId) {
+    const button = buttonsConfig.buttons.find(b => b.id === buttonId);
+    if (!button) return;
     
     // Check if server selection is required
     if (button.requires_server) {
@@ -395,7 +435,7 @@ async function executeButtonCommand(clientId, buttonId) {
             args: processedArgs
         };
         
-        sendCommand(clientId, command);
+        await sendCommand(clientId, command);
     } else {
         // Regular command without server dependency
         const command = {
@@ -403,7 +443,7 @@ async function executeButtonCommand(clientId, buttonId) {
             args: button.args
         };
         
-        sendCommand(clientId, command);
+        await sendCommand(clientId, command);
     }
 }
 
