@@ -1,4 +1,4 @@
-# DriVR - Assetto Corsa Control System
+# SimCentre
 
 A system for remotely controlling multiple Assetto Corsa client setups through a web dashboard.
 
@@ -17,24 +17,26 @@ A system for remotely controlling multiple Assetto Corsa client setups through a
 * Install [AutoHotkey (AHK)](https://www.autohotkey.com/).
 
 ```sh
-pip install -r requirements.txt 
+pip install -r .\requirements.txt
 
-cd client 
+cd .\client\
 
 // Set environment variables (PowerShell)
 $env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
 
 // Run client server (port 5000)
-python run.py
+python .\run.py
 ```
 
 ### 2. Setup Dashboard (central control)
 
 ```sh
-cd dashboard
+pip install -r .\requirements.txt
+
+cd .\dashboard\
 
 // Run dashboard (port 8080)
-python run.py
+python .\run.py
 ```
 
 ### 3. Access Dashboard
