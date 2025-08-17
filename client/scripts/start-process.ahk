@@ -21,6 +21,9 @@ if A_Args.Length > 2 {
     if (pathPrefix = "A_MyDocuments") {
         pathPrefix := A_MyDocuments
     }
+    if (pathPrefix = "A_Desktop") {
+        pathPrefix := A_Desktop
+    }
     ; Prepend the path prefix to process name
     processName := pathPrefix "\" processName
 }
