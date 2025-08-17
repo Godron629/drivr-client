@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RaceDirector</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -18,9 +19,16 @@
     </div>
 
     <div class="footer">
-        <button id="clear-storage-btn" class="clear-storage" onclick="clearLocalStorage()">
-            Clear Saved Data
-        </button>
+        <div class="footer-controls">
+            <div class="config-links">
+                <a href="/config/clients.json" target="_blank" class="clear-storage">Clients Config</a>
+                <a href="/config/servers.json" target="_blank" class="clear-storage">Servers Config</a>
+                <a href="/config/buttons.json" target="_blank" class="clear-storage">Buttons Config</a>
+            </div>
+            <button id="clear-storage-btn" class="clear-storage" onclick="clearLocalStorage()">
+                Clear Saved Data
+            </button>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>

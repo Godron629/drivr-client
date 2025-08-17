@@ -385,3 +385,39 @@ body {
     transform: none !important;
     box-shadow: var(--shadow-sm) !important;
 }
+
+/* Footer controls */
+.footer-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.config-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.config-links .clear-storage {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.config-links .clear-storage:hover {
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .footer-controls {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .config-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
