@@ -35,16 +35,18 @@ async function loadClientsConfig() {
         clientsConfig = await response.json();
         console.log('Loaded clients config:', clientsConfig);
         
-        // Check localStorage for saved assignments
+        // Check localStorage for saved assignments and nicknames
         const savedAssignments = localStorage.getItem('clientAssignments');
         const assignments = savedAssignments ? JSON.parse(savedAssignments) : {};
+        const savedNicknames = localStorage.getItem('clientNicknames');
+        const nicknames = savedNicknames ? JSON.parse(savedNicknames) : {};
         
         // Convert config clients to runtime clients with generated IDs and empty nicknames
         clients = clientsConfig.clients.map((configClient, index) => ({
             id: `client_${index}`,
             name: configClient.name,
             ip: configClient.ip,
-            nickname: '',
+            nickname: nicknames[`client_${index}`] || '',
             status: 'unknown',
             selectedServer: assignments[`client_${index}`] || configClient.selectedServer
         }));
@@ -76,10 +78,13 @@ async function loadServersConfig() {
     }
 }
 
-function updateNickname(clientId, nickname) {
+async function updateNickname(clientId, nickname) {
     const client = clients.find(c => c.id == clientId);
     if (client) {
         client.nickname = nickname;
+        
+        // Save nicknames to localStorage
+        await saveClientNicknames();
     }
 }
 
@@ -109,6 +114,22 @@ async function saveClientsConfig() {
         console.log('Saved client assignments to localStorage');
     } catch (error) {
         console.error('Error saving client assignments:', error);
+    }
+}
+
+async function saveClientNicknames() {
+    try {
+        // Save nicknames to localStorage
+        const nicknames = {};
+        clients.forEach(client => {
+            if (client.nickname) {
+                nicknames[client.id] = client.nickname;
+            }
+        });
+        localStorage.setItem('clientNicknames', JSON.stringify(nicknames));
+        console.log('Saved client nicknames to localStorage');
+    } catch (error) {
+        console.error('Error saving client nicknames:', error);
     }
 }
 
