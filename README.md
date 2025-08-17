@@ -1,8 +1,8 @@
-# SimCentre
+# RaceLink - Sim Control System
 
-A system for remotely controlling multiple Assetto Corsa client setups through a web dashboard.
+A generic control system for interacting with sim rigs through a centralized web dashboard.
 
-![DriVR Control Dashboard](assets/drivr.png)
+![RaceLink](assets/racelink.png)
 
 ## Components
 

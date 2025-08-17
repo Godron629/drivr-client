@@ -45,3 +45,8 @@ def run():
         }), 400
     except FileNotFoundError:
         return jsonify({"error": f"AutoHotkey executable not found at '{AHK_EXE}'"}), 404
+
+{
+    "script_name": "send-keystrokes.ahk",
+    "arguments": ["abc"]
+}
