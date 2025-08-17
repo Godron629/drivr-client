@@ -504,12 +504,12 @@ function updateClientButtonStates(clientId, status) {
         }
     });
     
-    // Disable/enable server select and nickname input too
+    // Keep server select and nickname input always enabled
     if (serverSelect) {
-        serverSelect.disabled = isOffline;
+        serverSelect.disabled = false;
     }
     if (nicknameInput) {
-        nicknameInput.disabled = isOffline;
+        nicknameInput.disabled = false;
     }
 }
 
