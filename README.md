@@ -20,10 +20,8 @@ Remote control multiple racing sim setups from a single web dashboard. Send comm
 
 ```powershell
 pip install -r .\requirements.txt
-cd .\client\
 
-# Set AutoHotkey path
-$env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
+cd .\client\
 
 # Start client (port 5000)
 python .\run.py
@@ -62,7 +60,7 @@ Configure clients and servers by editing the JSON files in `dashboard/app/static
   "servers": [
     {
       "id": 1,
-      "name": "Main Race Server", 
+      "name": "Main Race Server",
       "ip": "192.168.1.100",
       "port": "9600",
       "password": ""
