@@ -20,6 +20,7 @@ body {
     border-radius: 15px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 .header h1 {
@@ -27,6 +28,29 @@ body {
     font-weight: 600;
     font-size: 2.2rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.clear-storage {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.clear-storage:hover {
+    opacity: 1;
+    background: #7f8c8d;
 }
 
 .dashboard {

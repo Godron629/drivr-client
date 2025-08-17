@@ -133,6 +133,17 @@ async function saveClientNicknames() {
     }
 }
 
+function clearLocalStorage() {
+    if (confirm('Are you sure you want to clear all saved assignments and nicknames? This cannot be undone.')) {
+        localStorage.removeItem('clientAssignments');
+        localStorage.removeItem('clientNicknames');
+        console.log('Cleared localStorage data');
+        
+        // Reload the page to reset everything
+        location.reload();
+    }
+}
+
 
 
 
