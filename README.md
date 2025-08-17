@@ -39,10 +39,42 @@ cd .\dashboard\
 python .\run.py
 ```
 
-### 3. Connect & Control
+### 3. Configuration
+
+Configure clients and servers by editing the JSON files in `dashboard/app/static/`:
+
+**clients-config.json**: Define your sim rigs
+```json
+{
+  "clients": [
+    {
+      "name": "Rig 6",
+      "ip": "192.168.1.106",
+      "selectedServer": null
+    }
+  ]
+}
+```
+
+**servers-config.json**: Define available race servers
+```json
+{
+  "servers": [
+    {
+      "id": 1,
+      "name": "Main Race Server", 
+      "ip": "192.168.1.100",
+      "port": "9600",
+      "password": ""
+    }
+  ]
+}
+```
+
+### 4. Connect & Control
 
 1. Open `http://localhost:8080`
-2. Add clients by name and IP address
+2. Clients load automatically from configuration
 3. Use buttons to control each setup remotely
 
 
