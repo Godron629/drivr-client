@@ -5,7 +5,7 @@
       "label": "Race Invite",
       "type": "primary",
       "script": "start-process.ahk",
-      "args": ["Content Manager.exe", "acmanager://race/online/join?ip={server_ip}&httpPort=8081", "A_MyDocuments"],
+      "args": ["Content Manager.exe acmanager://race/online/join?ip={server_ip}&httpPort=8081", "", "A_MyDocuments"],
       "requires_server": true
     },
     {
