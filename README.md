@@ -1,44 +1,48 @@
-# RaceLink - Sim Control System
+# Sim Racing Control System
 
-A generic control system for interacting with sim rigs through a centralized web dashboard.
+Remote control multiple racing sim setups from a single web dashboard. Send commands, toggle settings, and manage racing sessions across your network.
 
 ![RaceLink](assets/racelink.png)
 
-## Components
+## How It Works
 
-- **Client** (`client/`): Flask server that runs on each sim setup, executes AutoHotkey scripts
-- **Dashboard** (`dashboard/`): Web-based control interface for managing multiple clients
-- **AHK Scripts** (`ahk/`): AutoHotkey scripts for game interaction
+- **Client**: Runs on each sim setup, executes commands via AutoHotkey
+- **Dashboard**: Web interface to control all connected clients
+- **Commands**: Pre-configured actions like race invites, setting toggles, game controls
 
-## Quick Start
+## Setup
 
-### 1. Start Client (on each sim setup)
+### Prerequisites
+- [AutoHotkey v2](https://www.autohotkey.com/) installed on each sim setup
+- Python 3.7+ on all machines
 
-* Install [AutoHotkey (AHK)](https://www.autohotkey.com/).
+### 1. Client Setup (each sim setup)
 
-```sh
+```powershell
 pip install -r .\requirements.txt
-
 cd .\client\
 
-// Set environment variables (PowerShell)
+# Set AutoHotkey path
 $env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
 
-// Run client server (port 5000)
+# Start client (port 5000)
 python .\run.py
 ```
 
-### 2. Setup Dashboard (central control)
+### 2. Dashboard Setup (control machine)
 
-```sh
+```powershell
 pip install -r .\requirements.txt
-
 cd .\dashboard\
 
-// Run dashboard (port 8080)
+# Start dashboard (port 8080)
 python .\run.py
 ```
 
-### 3. Access Dashboard
-Open browser to `http://localhost:8080` and add your client IPs to start controlling them.
+### 3. Connect & Control
+
+1. Open `http://localhost:8080`
+2. Add clients by name and IP address
+3. Use buttons to control each setup remotely
+
 
