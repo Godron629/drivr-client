@@ -1,5 +1,5 @@
 from app import create_app
-from config import DASHBOARD_HOST, DASHBOARD_PORT, DASHBOARD_DEBUG
+from app.config import DASHBOARD_HOST, DASHBOARD_PORT, DASHBOARD_DEBUG
 
 app = create_app()
 

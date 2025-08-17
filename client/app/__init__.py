@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from . import config
 
 import subprocess
 import os
-from app import config
 
 def create_app():
     app = Flask(__name__)

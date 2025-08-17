@@ -1,5 +1,5 @@
 from app import create_app
-from config import CLIENT_HOST, CLIENT_PORT, CLIENT_DEBUG
+from app.config import CLIENT_HOST, CLIENT_PORT, CLIENT_DEBUG
 
 app = create_app()
 
