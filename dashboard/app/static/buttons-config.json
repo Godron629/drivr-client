@@ -57,14 +57,6 @@
       "requires_server": false
     },
     {
-      "id": "cycle_views",
-      "label": "Views",
-      "type": "secondary",
-      "script": "send-keystroke.ahk",
-      "args": ["acs.exe", "{f1}"],
-      "requires_server": false
-    },
-    {
       "id": "remove_client",
       "label": "Remove Client",
       "type": "danger",

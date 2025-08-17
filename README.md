@@ -1,8 +1,8 @@
-# DriVR - Assetto Corsa Control System
+# RaceLink - Generic Control System
 
-A system for remotely controlling multiple Assetto Corsa client setups through a web dashboard.
+A generic control system for interacting with sim rigs through a centralized web dashboard.
 
-![DriVR Control Dashboard](assets/drivr.png)
+![RaceLink Dashboard](assets/drivr.png)
 
 ## Components
 
@@ -17,9 +17,9 @@ A system for remotely controlling multiple Assetto Corsa client setups through a
 * Install [AutoHotkey (AHK)](https://www.autohotkey.com/).
 
 ```sh
-pip install -r requirements.txt 
+pip install -r requirements.txt
 
-cd client 
+cd client
 
 // Set environment variables (PowerShell)
 $env:AHK_EXE="C:\Program Files\AutoHotkey\v2\AutoHotKey.exe"
