@@ -1,6 +1,7 @@
 from app import create_app
+from config import CLIENT_HOST, CLIENT_PORT, CLIENT_DEBUG
 
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host=CLIENT_HOST, port=CLIENT_PORT, debug=CLIENT_DEBUG)

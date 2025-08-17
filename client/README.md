@@ -8,6 +8,9 @@ The client can be configured using environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `CLIENT_PORT` | `5000` | Port the client server runs on |
+| `CLIENT_HOST` | `0.0.0.0` | Host the client server binds to |
+| `CLIENT_DEBUG` | `True` | Enable debug mode |
 | `AHK_EXE` | `C:/Program Files/AutoHotkey/AutoHotkey.exe` | Path to AutoHotkey executable |
 | `SCRIPTS_DIR` | `scripts/` | Directory containing AutoHotkey scripts |
 

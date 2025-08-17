@@ -46,6 +46,7 @@ async function loadClientsConfig() {
             id: configClient.id,
             name: configClient.name,
             ip: configClient.ip,
+            port: configClient.port || 5000,
             nickname: nicknames[configClient.id] || '',
             status: 'unknown',
             selectedServer: assignments[configClient.id] || configClient.selectedServer
@@ -272,7 +273,7 @@ function createClientBox(client) {
                     ${client.name}
                     <span class="status-indicator" id="status-indicator-${client.id}" title="Client status"></span>
                 </div>
-                <div class="client-ip">${client.ip}:5000</div>
+                <div class="client-ip">${client.ip}:${client.port}</div>
                 <div class="nickname-section">
                     <input type="text" class="nickname-input" id="nickname-${client.id}" 
                            placeholder="Driver nickname..." 
@@ -309,7 +310,7 @@ async function sendCommand(clientId, command) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
         
-        const response = await fetch(`http://${client.ip}:5000/run`, {
+        const response = await fetch(`http://${client.ip}:${client.port}/run`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -488,7 +489,7 @@ async function checkClientHealth(clientId) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
         
-        const response = await fetch(`http://${client.ip}:5000/health`, {
+        const response = await fetch(`http://${client.ip}:${client.port}/health`, {
             method: 'GET',
             signal: controller.signal
         });
