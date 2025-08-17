@@ -1,8 +1,8 @@
-# RaceLink - Generic Control System
+# RaceLink - Sim Control System
 
 A generic control system for interacting with sim rigs through a centralized web dashboard.
 
-![RaceLink Dashboard](assets/drivr.png)
+![RaceLink](assets/drivr.png)
 
 ## Components
 
