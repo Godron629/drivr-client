@@ -65,7 +65,7 @@
   --transition: 150ms ease-in-out;
 
   /* ========== LAYOUT ========== */
-  --container-padding: var(--space-6);
-  --grid-gap: var(--space-5);
-  --card-padding: var(--space-6);
+  --container-padding: var(--space-3);
+  --grid-gap: var(--space-3);
+  --card-padding: var(--space-4);
 }
