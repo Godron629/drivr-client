@@ -31,21 +31,22 @@ Buttons load automatically on refresh.
 
 ## Configuration Files
 
-**clients.json**: Define sim rigs with ID, name, IP address, and selected server
+Configure clients and servers by editing the JSON files in `config/`:
+
+**clients.json**: Define your sim rigs
 ```json
 {
   "clients": [
     {
-      "id": 1,
       "name": "Rig 6",
-      "ip": "192.168.1.106", 
+      "ip": "192.168.1.106",
       "selectedServer": null
     }
   ]
 }
 ```
 
-**servers.json**: Define available race servers with connection details
+**servers.json**: Define available race servers
 ```json
 {
   "servers": [
@@ -53,7 +54,7 @@ Buttons load automatically on refresh.
       "id": 1,
       "name": "Main Race Server",
       "ip": "192.168.1.100",
-      "port": "9600", 
+      "port": "9600",
       "password": ""
     }
   ]
@@ -61,4 +62,11 @@ Buttons load automatically on refresh.
 ```
 
 Both files are loaded automatically when the dashboard starts.
+
+## API Endpoints
+
+- `GET /` - Main dashboard interface
+- `GET /config/<filename>` - Serve configuration files (clients.json, servers.json, buttons.json)
+
+The dashboard runs on port 8080 by default and accepts connections from any IP (0.0.0.0).
 
