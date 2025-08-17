@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadClientsConfig();
     await loadServersConfig();
     renderClients();
-    renderRaceServers();
     startHealthMonitoring();
 });
 
@@ -42,7 +41,8 @@ async function loadClientsConfig() {
             name: configClient.name,
             ip: configClient.ip,
             nickname: '',
-            status: 'unknown'
+            status: 'unknown',
+            selectedServer: null
         }));
     } catch (error) {
         console.error('Failed to load clients config:', error);
@@ -79,6 +79,15 @@ function updateNickname(clientId, nickname) {
     }
 }
 
+function updateClientServer(clientId, serverValue) {
+    const client = clients.find(c => c.id == clientId);
+    if (client) {
+        client.selectedServer = serverValue || null;
+        // Re-render to update grouping
+        renderClients();
+    }
+}
+
 
 
 
@@ -86,14 +95,67 @@ function renderClients() {
     const container = document.getElementById('clients-container');
     container.innerHTML = '';
     
+    // Group clients by selected server
+    const clientsByServer = new Map();
+    
+    // Add unassigned clients
+    const unassignedClients = clients.filter(client => !client.selectedServer);
+    if (unassignedClients.length > 0) {
+        clientsByServer.set('unassigned', {
+            name: 'Unassigned',
+            clients: unassignedClients
+        });
+    }
+    
+    // Group clients by their selected server
     clients.forEach(client => {
-        const clientBox = createClientBox(client);
-        container.appendChild(clientBox);
+        if (client.selectedServer) {
+            const server = raceServers.find(s => `${s.ip}:${s.port || '9600'}` === client.selectedServer);
+            if (server) {
+                const serverKey = client.selectedServer;
+                if (!clientsByServer.has(serverKey)) {
+                    clientsByServer.set(serverKey, {
+                        name: server.name,
+                        clients: []
+                    });
+                }
+                clientsByServer.get(serverKey).clients.push(client);
+            }
+        }
+    });
+    
+    // Render each server group
+    clientsByServer.forEach((serverGroup, serverKey) => {
+        const serverContainer = document.createElement('div');
+        serverContainer.className = 'server-group';
+        serverContainer.id = `server-group-${serverKey}`;
         
-        // Populate the server dropdown for this client
+        const serverHeader = document.createElement('div');
+        serverHeader.className = 'server-group-header';
+        serverHeader.innerHTML = `<h3>${serverGroup.name}</h3>`;
+        serverContainer.appendChild(serverHeader);
+        
+        const clientsGrid = document.createElement('div');
+        clientsGrid.className = 'clients-grid';
+        
+        serverGroup.clients.forEach(client => {
+            const clientBox = createClientBox(client);
+            clientsGrid.appendChild(clientBox);
+        });
+        
+        serverContainer.appendChild(clientsGrid);
+        container.appendChild(serverContainer);
+    });
+    
+    // Update server selects and status indicators after rendering
+    clients.forEach(client => {
         const select = document.getElementById(`server-select-${client.id}`);
         if (select) {
             updateServerSelect(select);
+            // Set the current selection
+            if (client.selectedServer) {
+                select.value = client.selectedServer;
+            }
         }
         
         // Update status indicator
@@ -120,7 +182,7 @@ function createClientBox(client) {
     const hasServerRequiredButtons = buttons.some(btn => btn.requires_server);
     if (hasServerRequiredButtons) {
         buttonsHTML += `
-            <select id="server-select-${client.id}" class="server-select">
+            <select id="server-select-${client.id}" class="server-select" onchange="updateClientServer('${client.id}', this.value)">
                 <option value="">Select Race Server</option>
             </select>
         `;

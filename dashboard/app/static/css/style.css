@@ -34,9 +34,37 @@ body {
 }
 
 #clients-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.server-group {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.server-group-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+}
+
+.server-group-header h3 {
+    color: #3498db;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.clients-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    gap: 20px;
 }
 
 .client-box {
