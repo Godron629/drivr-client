@@ -5,6 +5,7 @@ from . import config
 import subprocess
 import os
 
+
 def create_app():
     app = Flask(__name__)
     CORS(app)  # Enable CORS for cross-origin requests to client APIs
@@ -34,21 +35,23 @@ def create_app():
                 [config.AHK_EXE, script_path, *args],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
-            return jsonify({
-                "status": "success",
-                "stdout": result.stdout,
-                "stderr": result.stderr
-            })
+            return jsonify(
+                {"status": "success", "stdout": result.stdout, "stderr": result.stderr}
+            )
         except subprocess.CalledProcessError as e:
-            return jsonify({
-                "status": "error",
-                "stdout": e.stdout,
-                "stderr": e.stderr
-            }), 400
+            return (
+                jsonify({"status": "error", "stdout": e.stdout, "stderr": e.stderr}),
+                400,
+            )
         except FileNotFoundError:
-            return jsonify({"error": f"AutoHotkey executable not found at '{config.AHK_EXE}'"}), 404
+            return (
+                jsonify(
+                    {"error": f"AutoHotkey executable not found at '{config.AHK_EXE}'"}
+                ),
+                404,
+            )
 
     @app.route("/health", methods=["GET"])
     def health():
